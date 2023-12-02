@@ -4,5 +4,6 @@ export const AppPages = {
   HOME: 'home',
   HOME_STACK: 'homeStack',
   AUTH_STACK: 'authStack',
-  PROFILE: 'profile',
+  POST: 'post',
+  NETWORK: 'network',
 };

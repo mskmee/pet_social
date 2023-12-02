@@ -1,14 +1,16 @@
 import React from 'react';
 import {AppPages} from '../types/enums/app-pages';
 import Home from './home';
-import Profile from './profile';
+import Post from './post';
+import Network from './network';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {AppIcon} from '../components/app-icon';
 
 const Tab = createBottomTabNavigator();
 const HomeIcon = ({color}) => <AppIcon type="home" color={color} size={35} />;
-const ProfileIcon = ({color}) => (
-  <AppIcon type="account" color={color} size={35} />
+const PostIcon = ({color}) => <AppIcon type="post" color={color} size={35} />;
+const NetworkIcon = ({color}) => (
+  <AppIcon type="network" color={color} size={35} />
 );
 
 function HomeStack() {
@@ -29,14 +31,20 @@ function HomeStack() {
         component={Home}
         options={{
           tabBarIcon: HomeIcon,
-          tabBarLabelStyle: {color: 'red'},
         }}
       />
       <Tab.Screen
-        name={AppPages.PROFILE}
-        component={Profile}
+        name={AppPages.NETWORK}
+        component={Network}
         options={{
-          tabBarIcon: ProfileIcon,
+          tabBarIcon: NetworkIcon,
+        }}
+      />
+      <Tab.Screen
+        name={AppPages.POST}
+        component={Post}
+        options={{
+          tabBarIcon: PostIcon,
         }}
       />
     </Tab.Navigator>

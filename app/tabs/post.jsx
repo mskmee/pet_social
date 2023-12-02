@@ -1,7 +1,7 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
-export default function Profile() {
+export default function Post() {
   return (
     <View>
       <Text>Profile</Text>

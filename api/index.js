@@ -118,4 +118,43 @@ app.get('/verify/:verificationToken', async (req, res) => {
   }
 });
 
+app.get('/profile/:userId', async (req, res) => {
+  try {
+    const {userId} = req.params || {};
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({message: 'User not found'});
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.log('Error getting profile', error);
+    res.status(500).json({message: 'Error getting profile'});
+  }
+});
+
+app.get('/users/:userId', async (req, res) => {
+  try {
+    const {userId} = req.params || {};
+    const loggedInUser = await User.findById(userId).populate(
+      'connections',
+      '_id',
+    );
+    if (!loggedInUser) {
+      return res.status(400).json({message: 'User not found'});
+    }
+    const connectedUsersId = loggedInUser.connections.map(
+      connection => connection._id,
+    );
+
+    const users = await User.find({
+      _id: {$ne: loggedInUser, $nin: connectedUsersId},
+    });
+
+    return res.status(200).json(users);
+  } catch (error) {
+    console.log('Error getting user', error);
+    res.status(500).json({message: 'Error getting users'});
+  }
+});
+
 app.listen(PORT, () => console.log('Server running on port', fullUrl));
