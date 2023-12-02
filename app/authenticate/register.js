@@ -35,8 +35,7 @@ const Register = () => {
       profileImage: image,
     };
     try {
-      const response = await axios.post('http://10.0.2.2:8000/register', user);
-      console.log(response);
+      await axios.post('http://10.0.2.2:8000/register', user);
       Alert.alert('Registration successful');
       setName('');
       setImage('');

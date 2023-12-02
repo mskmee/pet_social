@@ -37,7 +37,7 @@ export default function Login() {
       setPassword('');
       setEmail('');
       storage.set('token', response.data.token);
-      navigation.navigate(AppPages.HOME_STACK);
+      navigation.reset({index: 0, routes: [{name: AppPages.HOME_STACK}]});
     } catch (error) {
       Alert.alert(error.message);
     }

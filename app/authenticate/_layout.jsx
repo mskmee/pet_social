@@ -9,17 +9,16 @@ import {useNavigation} from '@react-navigation/native';
 const Stack = createStackNavigator();
 
 function AuthStack() {
-  const navigation = useNavigation();
-  useEffect(() => {
-    const checkAuth = async () => {
-      const isAuth = await storage.get('token');
-      console.log(isAuth);
-      if (isAuth) {
-        navigation.navigate(AppPages.HOME_STACK);
-      }
-    };
-    checkAuth();
-  }, [navigation]);
+  // const navigation = useNavigation();
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     const isAuth = await storage.get('token');
+  //     if (isAuth) {
+  //       navigation.reset({index: 0, routes: [{name: AppPages.HOME_STACK}]});
+  //     }
+  //   };
+  //   checkAuth();
+  // }, [navigation]);
 
   return (
     <Stack.Navigator
