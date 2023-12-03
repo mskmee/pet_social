@@ -4,9 +4,11 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
 require('dotenv').config();
 
-const {PORT, URL, EMAIL_PASSWORD, MONGO_PASSWORD} = process.env;
+const {PORT, URL, EMAIL_PASSWORD, MONGO_PASSWORD, SAULT_ROUND} = process.env;
 
 const app = express();
 const cors = require('cors');
@@ -19,6 +21,17 @@ app.use(bodyParser.json());
 
 const User = require('./models/user');
 const Post = require('./models/post');
+
+mongoose
+  .connect(
+    `mongodb+srv://admin:${MONGO_PASSWORD}@cluster0.okahdbs.mongodb.net/`,
+  )
+  .then(() => {
+    console.log('connected to Mongodb');
+  })
+  .catch(err => {
+    console.log(`Connect to mongodb failed: ${err}`);
+  });
 
 const generateSecretKey = () => {
   return crypto.randomBytes(32).toString('hex');
@@ -48,17 +61,6 @@ const sendVerificationEmail = async (email, verificationToken) => {
   }
 };
 
-mongoose
-  .connect(
-    `mongodb+srv://admin:${MONGO_PASSWORD}@cluster0.okahdbs.mongodb.net/`,
-  )
-  .then(() => {
-    console.log('connected to Mongodb');
-  })
-  .catch(err => {
-    console.log(`Connect to mongodb failed: ${err}`);
-  });
-
 app.post('/register', async (req, res) => {
   try {
     const {name, email, password, profileImage} = req.body;
@@ -69,7 +71,14 @@ app.post('/register', async (req, res) => {
     if (isEmailExist) {
       return res.status(400).json({message: 'Email already exists'});
     }
-    const newUser = new User({name, email, password, profileImage});
+    const salt = bcrypt.genSaltSync(+SAULT_ROUND);
+    const passwordHash = await bcrypt.hash(password, salt);
+    const newUser = new User({
+      name,
+      email,
+      password: passwordHash,
+      profileImage,
+    });
     newUser.verificationToken = crypto.randomBytes(20).toString('hex');
     await newUser.save();
     sendVerificationEmail(newUser.email, newUser.verificationToken);
@@ -89,7 +98,8 @@ app.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({message: 'Invalid username or password'});
     }
-    if (user.password !== password) {
+    const isPasswordCompare = await bcrypt.compare(password, user.password);
+    if (!isPasswordCompare) {
       return res.status(401).json({message: 'Invalid username or password'});
     }
     const token = jwt.sign({userId: user._id}, secretKey);
