@@ -98,8 +98,8 @@ app.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({message: 'Invalid username or password'});
     }
-    const isPasswordCompare = await bcrypt.compare(password, user.password);
-    if (!isPasswordCompare) {
+    const isIdentical = await bcrypt.compare(password, user.password);
+    if (!isIdentical) {
       return res.status(401).json({message: 'Invalid username or password'});
     }
     const token = jwt.sign({userId: user._id}, secretKey);
