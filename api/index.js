@@ -63,7 +63,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
 
 app.post('/register', async (req, res) => {
   try {
-    const {name, email, password, profileImage} = req.body;
+    const {name, email, password, profileImage} = req.body || {};
     if (!name || !email || !password) {
       throw new Error('Entry required fields');
     }
@@ -93,7 +93,7 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   try {
-    const {email, password} = req.body;
+    const {email, password} = req.body || {};
     const user = await User.findOne({email});
     if (!user) {
       return res.status(401).json({message: 'Invalid username or password'});
@@ -112,7 +112,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/verify/:verificationToken', async (req, res) => {
   try {
-    const {verificationToken} = req.params;
+    const {verificationToken} = req.params || {};
     const user = await User.findOne({verificationToken});
     if (!user) {
       console.log('Error verifying didnt find user');
@@ -131,7 +131,13 @@ app.get('/verify/:verificationToken', async (req, res) => {
 app.get('/profile/:userId', async (req, res) => {
   try {
     const {userId} = req.params || {};
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, {
+      verificationToken: 0,
+      password: 0,
+      createdAt: 0,
+      verified: 0,
+      __v: 0,
+    });
     if (!user) {
       return res.status(404).json({message: 'User not found'});
     }
@@ -156,9 +162,12 @@ app.get('/users/:userId', async (req, res) => {
       connection => connection._id,
     );
 
-    const users = await User.find({
-      _id: {$ne: loggedInUser, $nin: connectedUsersId},
-    });
+    const users = await User.find(
+      {
+        _id: {$ne: userId, $nin: connectedUsersId},
+      },
+      {verificationToken: 0, createdAt: 0, verified: 0, __v: 0, password: 0},
+    );
 
     return res.status(200).json(users);
   } catch (error) {

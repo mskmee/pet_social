@@ -20,6 +20,13 @@ class Storage {
       console.log('Error getting value', error);
     }
   }
+  async remove(key) {
+    try {
+      return await this.storage.removeItem(key);
+    } catch (error) {
+      console.log('Error removing key', error);
+    }
+  }
 }
 
 export const storage = new Storage();

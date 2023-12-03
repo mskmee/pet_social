@@ -36,6 +36,7 @@ const Register = () => {
     };
     try {
       await axios.post('http://10.0.2.2:8000/register', user);
+      console.log('da');
       Alert.alert('Registration successful');
       setName('');
       setImage('');
@@ -111,7 +112,6 @@ const Register = () => {
             <AppIcon style={{marginLeft: 8}} type="email" size={25} />
             <TextInput
               value={email}
-              secureTextEntry
               style={{
                 color: 'gray',
                 marginVertical: 5,

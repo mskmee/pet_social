@@ -1,10 +1,13 @@
 import {View, Text} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {storage} from '../helpers/storage';
 import {Buffer} from 'buffer';
+import axios from 'axios';
 
 const Network = () => {
   const [userId, setUserId] = useState('');
+  const [userProfile, setUserProfile] = useState(null);
+  const [usersData, setUsersData] = useState([]);
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -24,6 +27,38 @@ const Network = () => {
     };
     fetchUser();
   }, []);
+
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `http://10.0.2.2:8000/profile/${userId}`,
+      );
+      setUserProfile(response.data.user);
+    } catch (error) {
+      console.log('Error with get profile', error);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    fetchUserProfile();
+  }, [userId, fetchUserProfile]);
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    const fetchUsersProfile = async () => {
+      const response = await axios.get(`http://10.0.2.2:8000/users/${userId}`);
+      setUsersData(response.data);
+      console.log(response.data, 'users');
+    };
+    fetchUsersProfile();
+    try {
+    } catch (error) {}
+  }, [userId]);
 
   return (
     <View>
